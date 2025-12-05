@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-maple-darker via-maple-dark to-maple-darker text-white min-h-screen;
+    font-family: 'Arial', sans-serif;
+  }
+}
+
+@layer base {
+  * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  input, textarea {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+  
+  button, a, [role="button"] {
+    cursor: pointer;
+  }
+  
+  button:active, a:active, [role="button"]:active {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-maple-red hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl select-none;
+  }
+  
+  .btn-secondary {
+    @apply bg-maple-blue hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl select-none;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-maple-red focus:border-transparent transition-all;
+  }
+  
+  .card {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 shadow-2xl;
+  }
+}
