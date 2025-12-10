@@ -4,11 +4,12 @@ const API_URL = '/api'
 
 axios.defaults.withCredentials = true
 
-export const register = async (username, password, pin) => {
+export const register = async (username, password, pin, dob) => {
   const response = await axios.post(`${API_URL}/register`, {
     username,
     password,
-    pin
+    pin,
+    dob
   })
   return response.data
 }

@@ -84,13 +84,13 @@ app.get('/api/health', (req, res) => {
 // Register endpoint
 app.post('/api/register', async (req, res) => {
   try {
-    const { username, password, pin } = req.body;
+    const { username, password, pin, dob } = req.body;
 
     // Validation
-    if (!username || !password || !pin) {
+    if (!username || !password || !pin || dob === undefined) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Username, password, and PIN are required' 
+        message: 'Username, password, PIN, and DOB are required' 
       });
     }
 
@@ -132,7 +132,15 @@ app.post('/api/register', async (req, res) => {
     // Hash password using SHA-512 (same as game server)
     const hashedPassword = hashPassword(password);
 
-    // Insert new account with default values (using user-provided PIN)
+    // Validate DOB: numeric YYYYMMDD
+    if (!/^\d{8}$/.test(String(dob))) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'DOB must be 8 digits in YYYYMMDD format' 
+      });
+    }
+
+    // Insert new account with default values (using user-provided PIN and DOB)
     const [result] = await db.execute(
       `INSERT INTO accounts 
        (username, password, pin, isLogedIn, adminLevel, isBanned, gender, dob, eula, nx, maplepoints) 
@@ -145,7 +153,7 @@ app.post('/api/register', async (req, res) => {
         DEFAULT_VALUES.adminLevel,
         DEFAULT_VALUES.isBanned,
         DEFAULT_VALUES.gender,
-        DEFAULT_VALUES.dob,
+        dob,
         DEFAULT_VALUES.eula,
         DEFAULT_VALUES.nx,
         DEFAULT_VALUES.maplepoints

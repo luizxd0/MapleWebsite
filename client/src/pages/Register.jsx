@@ -8,7 +8,8 @@ function Register() {
     password: '',
     confirmPassword: '',
     pin: '',
-    confirmPin: ''
+    confirmPin: '',
+    dob: ''
   })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -54,10 +55,20 @@ function Register() {
       return
     }
 
+    // Validate DOB: expect DD/MM/YYYY, store as YYYYMMDD
+    const dobTrimmed = formData.dob.trim()
+    const dobRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/(\d{4})$/
+    if (!dobRegex.test(dobTrimmed)) {
+      setError('Date of birth must be in DD/MM/YYYY format')
+      return
+    }
+    const [, day, month, year] = dobRegex.exec(dobTrimmed)
+    const dobInt = parseInt(`${year}${month}${day}`, 10)
+
     setLoading(true)
 
     try {
-      const response = await register(formData.username, formData.password, formData.pin)
+      const response = await register(formData.username, formData.password, formData.pin, dobInt)
       if (response.success) {
         setSuccess(true)
         setTimeout(() => {
@@ -187,6 +198,24 @@ function Register() {
                 maxLength={4}
                 pattern="\d{4}"
                 inputMode="numeric"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="dob" className="block mb-1 text-sm text-white/80">
+                Date of Birth (DD/MM/YYYY)
+              </label>
+              <input
+                type="text"
+                id="dob"
+                name="dob"
+                value={formData.dob}
+                onChange={handleChange}
+                className="input-field py-2 text-sm"
+                placeholder="DD/MM/YYYY"
+                required
+                inputMode="numeric"
+                pattern="(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/\d{4}"
               />
             </div>
           </div>
