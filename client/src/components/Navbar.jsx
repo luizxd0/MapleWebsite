@@ -8,7 +8,7 @@ function Navbar({ user, setUser }) {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="text-2xl font-bold text-maple-gold hover:text-yellow-400 transition-colors">
-            🍁 MapleStory v28
+            🍁 MapleStory v83
           </Link>
           
           <div className="flex items-center gap-6">

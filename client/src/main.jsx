@@ -1,5 +1,5 @@
 /**
- * MapleStory v28 Website - Frontend Entry Point
+ * MapleStory v83 Website - Frontend Entry Point
  * Developed by Lulubot
  */
 

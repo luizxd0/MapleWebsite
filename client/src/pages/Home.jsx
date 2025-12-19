@@ -6,7 +6,7 @@ function Home() {
       {/* Hero Section - Compact */}
       <div className="text-center mb-8">
         <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-maple-gold to-maple-red bg-clip-text text-transparent">
-          Welcome to MapleStory v28
+          Welcome to MapleStory v83
         </h1>
         <p className="text-lg text-white/80 mb-6">
           Experience the classic MapleStory adventure
@@ -27,7 +27,7 @@ function Home() {
           <div className="text-3xl mb-2">🎮</div>
           <h3 className="text-lg font-bold mb-1 text-maple-gold">Classic Experience</h3>
           <p className="text-sm text-white/70">
-            Relive the nostalgia of MapleStory v28
+            Relive the nostalgia of MapleStory v83
           </p>
         </div>
 
@@ -55,7 +55,7 @@ function Home() {
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
           <div>
-            <h4 className="text-sm font-semibold mb-1 text-maple-red">✓ Classic v28</h4>
+            <h4 className="text-sm font-semibold mb-1 text-maple-red">✓ Classic v83</h4>
             <p className="text-xs text-white/70">Authentic gameplay</p>
           </div>
           <div>

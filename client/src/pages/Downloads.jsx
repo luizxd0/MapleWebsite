@@ -86,7 +86,7 @@ function Downloads() {
         <div className="space-y-3 text-sm text-white/80">
           <div className="flex items-start gap-3">
             <span className="text-maple-gold font-bold min-w-[24px]">1.</span>
-            <p>Download the MapleStory v28 Client from the links above</p>
+            <p>Download the MapleStory v83 Client from the links above</p>
           </div>
           <div className="flex items-start gap-3">
             <span className="text-maple-gold font-bold min-w-[24px]">2.</span>
@@ -98,7 +98,7 @@ function Downloads() {
           </div>
           <div className="flex items-start gap-3">
             <span className="text-maple-gold font-bold min-w-[24px]">4.</span>
-            <p>Enjoy playing MapleStory v28!</p>
+            <p>Enjoy playing MapleStory v83!</p>
           </div>
         </div>
       </div>

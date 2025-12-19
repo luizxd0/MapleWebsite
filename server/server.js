@@ -1,5 +1,5 @@
 /**
- * MapleStory v28 Website - Backend Server
+ * MapleStory v83 Website - Backend Server
  * Developed by Lulubot
  * 
  * Express.js API server for user registration, authentication, and downloads
@@ -45,15 +45,16 @@ app.use(session({
 
 // Default account values (matching game server constants)
 const DEFAULT_VALUES = {
-  pin: '1111',
-  isLogedIn: 0,
-  adminLevel: 0,
-  isBanned: 0,
-  gender: 0,
-  dob: 11111111,
-  eula: 0,
-  nx: 0,
-  maplepoints: 0
+  pin: '',
+  loggedin: 0,
+  webadmin: 0,
+  banned: 0,
+  gender: 10,
+  birthday: '2005-05-11',
+  tos: 0,
+  nxCredit: 0,
+  maplePoint: 0,
+  characterslots: 3
 };
 
 // Routes
@@ -61,7 +62,7 @@ const DEFAULT_VALUES = {
 // Root route
 app.get('/', (req, res) => {
   res.json({
-    message: 'MapleStory v28 API Server',
+    message: 'MapleStory v83 API Server',
     version: '1.0.0',
     endpoints: {
       health: '/api/health',
@@ -118,7 +119,7 @@ app.post('/api/register', async (req, res) => {
 
     // Check if username already exists
     const [existing] = await db.execute(
-      'SELECT accountID FROM accounts WHERE username = ?',
+      'SELECT id FROM accounts WHERE `name` = ?',
       [username]
     );
 
@@ -132,7 +133,7 @@ app.post('/api/register', async (req, res) => {
     // Hash password using SHA-512 (same as game server)
     const hashedPassword = hashPassword(password);
 
-    // Validate DOB: numeric YYYYMMDD
+    // Validate DOB: numeric YYYYMMDD, convert to DATE format (YYYY-MM-DD)
     if (!/^\d{8}$/.test(String(dob))) {
       return res.status(400).json({ 
         success: false, 
@@ -140,30 +141,35 @@ app.post('/api/register', async (req, res) => {
       });
     }
 
+    // Convert YYYYMMDD to YYYY-MM-DD for DATE column
+    const dobStr = String(dob);
+    const birthday = `${dobStr.substring(0, 4)}-${dobStr.substring(4, 6)}-${dobStr.substring(6, 8)}`;
+
     // Insert new account with default values (using user-provided PIN and DOB)
     const [result] = await db.execute(
       `INSERT INTO accounts 
-       (username, password, pin, isLogedIn, adminLevel, isBanned, gender, dob, eula, nx, maplepoints) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (\`name\`, password, pin, loggedin, webadmin, banned, gender, birthday, tos, nxCredit, maplePoint, characterslots) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         username,
         hashedPassword,
-        pin, // Use user-provided PIN instead of default
-        DEFAULT_VALUES.isLogedIn,
-        DEFAULT_VALUES.adminLevel,
-        DEFAULT_VALUES.isBanned,
+        pin || DEFAULT_VALUES.pin,
+        DEFAULT_VALUES.loggedin,
+        DEFAULT_VALUES.webadmin,
+        DEFAULT_VALUES.banned,
         DEFAULT_VALUES.gender,
-        dob,
-        DEFAULT_VALUES.eula,
-        DEFAULT_VALUES.nx,
-        DEFAULT_VALUES.maplepoints
+        birthday,
+        DEFAULT_VALUES.tos,
+        DEFAULT_VALUES.nxCredit,
+        DEFAULT_VALUES.maplePoint,
+        DEFAULT_VALUES.characterslots
       ]
     );
 
     res.json({
       success: true,
       message: 'Account created successfully',
-      accountID: result.insertId
+      accountId: result.insertId
     });
 
   } catch (error) {
@@ -190,7 +196,7 @@ app.post('/api/login', async (req, res) => {
 
     // Get account from database
     const [accounts] = await db.execute(
-      'SELECT accountID, username, password, isBanned, isLogedIn FROM accounts WHERE username = ?',
+      'SELECT id, `name`, password, banned, loggedin FROM accounts WHERE `name` = ?',
       [username]
     );
 
@@ -212,7 +218,7 @@ app.post('/api/login', async (req, res) => {
     }
 
     // Check if banned
-    if (account.isBanned > 0) {
+    if (account.banned > 0) {
       return res.status(403).json({ 
         success: false, 
         message: 'Account is banned' 
@@ -220,15 +226,15 @@ app.post('/api/login', async (req, res) => {
     }
 
     // Set session
-    req.session.userId = account.accountID;
-    req.session.username = account.username;
+    req.session.userId = account.id;
+    req.session.username = account.name;
 
     res.json({
       success: true,
       message: 'Login successful',
       user: {
-        accountID: account.accountID,
-        username: account.username
+        accountId: account.id,
+        username: account.name
       }
     });
 
@@ -260,7 +266,7 @@ app.get('/api/user', async (req, res) => {
     try {
       // Get user data including NX credits
       const [accounts] = await db.execute(
-        'SELECT accountID, username, nx, maplepoints FROM accounts WHERE accountID = ?',
+        'SELECT id, `name`, nxCredit, maplePoint FROM accounts WHERE id = ?',
         [req.session.userId]
       );
 
@@ -275,10 +281,10 @@ app.get('/api/user', async (req, res) => {
       res.json({
         success: true,
         user: {
-          accountID: account.accountID,
-          username: account.username,
-          nx: account.nx || 0,
-          maplepoints: account.maplepoints || 0
+          accountId: account.id,
+          username: account.name,
+          nx: account.nxCredit || 0,
+          maplepoints: account.maplePoint || 0
         }
       });
     } catch (error) {
@@ -333,7 +339,7 @@ app.post('/api/change-password', async (req, res) => {
 
     // Get account from database
     const [accounts] = await db.execute(
-      'SELECT accountID, password FROM accounts WHERE accountID = ?',
+      'SELECT id, password FROM accounts WHERE id = ?',
       [req.session.userId]
     );
 
@@ -359,7 +365,7 @@ app.post('/api/change-password', async (req, res) => {
 
     // Update password in database
     await db.execute(
-      'UPDATE accounts SET password = ? WHERE accountID = ?',
+      'UPDATE accounts SET password = ? WHERE id = ?',
       [hashedNewPassword, req.session.userId]
     );
 
@@ -384,10 +390,10 @@ app.get('/api/downloads', (req, res) => {
     downloads: [
       {
         id: 1,
-        name: 'MapleStory v28 Client',
-        version: 'v28',
+        name: 'MapleStory v83 Client',
+        version: 'v83',
         size: '~2.5 GB',
-        description: 'Full game client for MapleStory v28',
+        description: 'Full game client for MapleStory v83',
         downloadUrl: '#',
         updatedAt: '2024-01-01'
       },
